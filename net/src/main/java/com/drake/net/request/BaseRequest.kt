@@ -36,14 +36,22 @@ import com.drake.net.reflect.typeTokenOf
 import com.drake.net.response.convert
 import com.drake.net.tag.NetTag
 import kotlinx.coroutines.CoroutineExceptionHandler
-import okhttp3.*
+import okhttp3.CacheControl
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Headers
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.OkHttpClient
+import okhttp3.OkHttpUtils
+import okhttp3.Request
 import java.io.File
 import java.lang.reflect.Type
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.typeOf
+
 
 abstract class BaseRequest {
 
@@ -127,11 +135,19 @@ abstract class BaseRequest {
         setUrl(url.toString())
     }
 
+    private var path: String? = ""
+
+    fun pathParam(name: String, value: Any) {
+        path = path?.replace("{$name}", value.toString(), true)
+        setPath(path)
+    }
+
     /**
      * 解析配置Path, 支持识别query参数和绝对路径
      * @param path 如果其不包含http/https则会自动拼接[NetConfig.host]
      */
     fun setPath(path: String?) {
+        this.path = path
         val url = path?.toHttpUrlOrNull()
         if (url == null) {
             try {

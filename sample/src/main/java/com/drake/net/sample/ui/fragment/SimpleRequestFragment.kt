@@ -25,7 +25,10 @@ class SimpleRequestFragment :
 
     private fun GET() {
         scopeNetLife {
-            binding.tvFragment.text = Get<String>(Api.TEXT).await()
+            binding.tvFragment.text = Get<String>(Api.PATH){
+                pathParam("type", "1")
+                pathParam("age", "12")
+            }.await()
         }
     }
 
